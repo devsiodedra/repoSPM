@@ -588,8 +588,6 @@ class M_api extends CI_Model {
         $this->db->offset($post['offset']);
         $contact = $this->db->get('contact_list')->result_array();
         return $contact;
-
-        
         
     }
 
