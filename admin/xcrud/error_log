@@ -1,0 +1,1 @@
+[01-Dec-2016 03:06:20 Etc/GMT] PHP Warning:  mysqli_connect(): Headers and client library minor version mismatch. Headers:50542 Library:50626 in /home/a27kpgzn/public_html/admin/xcrud/xcrud_db.php on line 50
