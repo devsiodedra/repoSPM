@@ -543,6 +543,14 @@ class M_api extends CI_Model {
 
                 $contact_id = (isset($contact_ids[$key]) && $contact_ids[$key] ) ? $contact_ids[$key] : '';
 
+                
+                $this->db->where('phone', $single_contact['phone']);
+                $exist = $this->db->get('contact_list')->row_array();
+
+                if(!$contact_id && $exist) {
+                    $contact_id = $exist['contact_id'];
+                }
+                
                 if($single_contact && $contact_id) {
                     
                     
