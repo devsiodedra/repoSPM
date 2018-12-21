@@ -510,6 +510,22 @@ class M_api extends CI_Model {
     }
     public function add_contacts($post = [],$userdata = [])
     {
+       // print_r($post); die;
+
+       // Temporary prospect
+       if(isset($post['is_prospect']) && $post['is_prospect']) {
+            
+            
+            $this->db->where('status', 1);
+            $this->db->where('category', 'prospects');
+            $cat = $this->db->get('user_category')->row_array();
+
+            if($cat) {
+                $post['category_id'] = $cat['category_id'];
+            }
+            
+       }
+
         if($post['phone'] && $post['first_name'] && $post['last_name']) {
             $phone = $post['phone'];
             $first_name = $post['first_name'];
@@ -522,6 +538,7 @@ class M_api extends CI_Model {
             $state = (isset($post['state']) && $post['state']) ? $post['state'] : [];
             $time_zone = (isset($post['time_zone']) && $post['time_zone']) ? $post['time_zone'] : [];
             $note = (isset($post['note']) && $post['note']) ? $post['note'] : [];
+            $image = (isset($post['image']) && $post['image']) ? $post['image'] : [];
             $contact_ids = (isset($post['contact_id']) && $post['contact_id']) ? $post['contact_id'] : '';
             
             $resp = false;
@@ -539,6 +556,7 @@ class M_api extends CI_Model {
                     'state' => (isset($state[$key]) && $state[$key] ) ? $state[$key] : '',
                     'time_zone' => (isset($time_zone[$key]) && $time_zone[$key] ) ? $time_zone[$key] : '',
                     'note' => (isset($note[$key]) && $note[$key] ) ? $note[$key] : '',
+                    'image' => (isset($image[$key]) && $image[$key] ) ? $image[$key] : '',
                 ];
 
                 $contact_id = (isset($contact_ids[$key]) && $contact_ids[$key] ) ? $contact_ids[$key] : '';
@@ -595,6 +613,11 @@ class M_api extends CI_Model {
         $this->db->limit($post['limit']);
         $this->db->offset($post['offset']);
         $contact = $this->db->get('contact_list')->result_array();
+        if($contact) {
+            foreach ($contact as $key => $value) {
+                $contact[$key]['image'] = $this->pic_url($contact[$key]['image']);
+            }
+        }
         return $contact;
         
     }

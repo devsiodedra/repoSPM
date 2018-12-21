@@ -1203,6 +1203,44 @@ class Api extends CI_Controller {
             $required = ['user_id','first_name','last_name','phone'];
             if ($this->check_parameters($required)) {
 
+                $phone = $post['phone'];
+                foreach ($phone as $key => $value) {
+
+                    if (isset($_FILES['image']) && !empty($_FILES['image']['name'][$key]) && !empty($_FILES['image']['name'][$key])) {
+
+
+                        $_FILES['userfile']['name']     = $_FILES['image']['name'][$key];
+                        $_FILES['userfile']['type']     = $_FILES['image']['type'][$key];
+                        $_FILES['userfile']['tmp_name'] = $_FILES['image']['tmp_name'][$key];
+                        $_FILES['userfile']['error']    = $_FILES['image']['error'][$key];
+                        $_FILES['userfile']['size']     = $_FILES['image']['size'][$key];
+
+                        $filename = '';
+                        $ext = '.' . pathinfo($_FILES['userfile']['name'], PATHINFO_EXTENSION);
+                        $filename = 'contact_'.date('dmyhis') . rand(1111, 9999) . $ext;
+
+                        $config = array(
+                            'upload_path' => '../../upload/',
+                            'allowed_types' => 'gif|jpg|png|bmp|jpeg',
+                            'allowed_types' => '*',
+                            'file_name' => $filename,
+                            'max_size' => '60000'
+                        );
+                        $this->upload->initialize($config);
+                        if ( ! $this->upload->do_upload()) {
+                            $error = array('error' => $this->upload->display_errors());
+                            $post['image'][$key] = '';
+                        }else {
+                            $final_files_data[] = $this->upload->data();
+                            $post['image'][$key] = $filename;
+                        }
+
+                        //$this->m_api->thumbCreate('../../upload/', '../../upload/thumb/', $filename);
+                    } else {
+                        $post['image'][$key] = '';
+                    }
+                }
+
                 $res = $this->m_api->add_contacts($post, $userdata);
                 if ($res) {
                     $this->response[] = array(
@@ -1239,6 +1277,13 @@ class Api extends CI_Controller {
                         'response_msg' => 'Contact listed successfully.',
                         'list' => $res,
                         'offset' => $post['offset'] + $post['limit'],
+                    );
+                    echo json_encode(array('response' => $this->response));
+                } else if(!$res) {
+                    $this->response[] = array(
+                        'status' => 'true',
+                        'response_msg' => 'Contact not  found.',
+                        'list' => [],
                     );
                     echo json_encode(array('response' => $this->response));
                 } else {
